@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { width: 260px; padding: 16px; font-family: -apple-system, sans-serif; font-size: 13px; color: #334155; }
+  h3 { margin: 0 0 8px; font-size: 14px; }
+  p { margin: 0 0 10px; line-height: 1.4; color: #64748b; }
+  button { width: 100%; padding: 8px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  button:hover { background: #1d4ed8; }
+</style>
+</head>
+<body>
+  <h3>📥 AIMS Review Helper</h3>
+  <p>Navigate to a review page on <strong>apply.aims.ac.za</strong>, then click the blue button at the bottom-right to download all PDFs and open the viewer.</p>
+  <button id="openViewer">Open Last Viewer</button>
+  <script>
+    document.getElementById('openViewer').addEventListener('click', () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('viewer.html') });
+    });
+  </script>
+</body>
+</html>

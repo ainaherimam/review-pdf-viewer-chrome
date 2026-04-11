@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "AIMS Review Helper",
+  "version": "1.0",
+  "description": "Download all candidate PDFs and browse them in a viewer tab",
+  "permissions": ["downloads", "activeTab", "scripting", "storage", "unlimitedStorage"],
+  "host_permissions": [
+    "https://prod-api-dot-baobab.appspot.com/*",
+    "https://apply.aims.ac.za/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://apply.aims.ac.za/*"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ]
+}
