@@ -1,6 +1,6 @@
 # Review Helper Extension
 
-A browser extension that enhances the academic review experience by providing quick access to review details, structured formatting, and an improved reading view.
+A browser extension that facilitate document review by providing a pdf viewer to some specific websites.
 
 ## Installation
 
