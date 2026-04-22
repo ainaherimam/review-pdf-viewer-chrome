@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "AIMS Review Helper",
+  "name": "PDF Review Viewer",
   "version": "1.0",
-  "description": "Download all candidate PDFs and browse them in a viewer tab",
-  "permissions": ["downloads", "activeTab", "scripting", "storage", "unlimitedStorage"],
+  "description": "Download all PDFs from a review page and browse them in a side-by-side viewer",
+  "permissions": ["downloads", "activeTab", "scripting", "storage", "unlimitedStorage", "declarativeNetRequest"],
   "host_permissions": [
     "https://prod-api-dot-baobab.appspot.com/*",
     "https://apply.aims.ac.za/*"
@@ -11,6 +11,15 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": "icon.png"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "cors_fix",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
   },
   "background": {
     "service_worker": "background.js"

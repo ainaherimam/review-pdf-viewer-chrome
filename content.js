@@ -120,42 +120,42 @@
   // ── Inline viewer (overlay on the same page) ──
 
   function buildViewer(appNum, pdfBlobs) {
-    const old = document.getElementById('aims-viewer-overlay');
+    const old = document.getElementById('pdv-viewer-overlay');
     if (old) old.remove();
 
     const overlay = document.createElement('div');
-    overlay.id = 'aims-viewer-overlay';
+    overlay.id = 'pdv-viewer-overlay';
     overlay.innerHTML = `
-      <div class="aims-v-header">
+      <div class="pdv-v-header">
         <div>
-          <span class="aims-v-title">Application ${appNum}</span>
-          <span class="aims-v-meta">${pdfBlobs.length} documents</span>
+          <span class="pdv-v-title">Application ${appNum}</span>
+          <span class="pdv-v-meta">${pdfBlobs.length} documents</span>
         </div>
-        <div class="aims-v-right">
-          <span class="aims-v-shortcuts">
-            <span class="aims-v-kbd">&larr;</span><span class="aims-v-kbd">&rarr;</span> switch
+        <div class="pdv-v-right">
+          <span class="pdv-v-shortcuts">
+            <span class="pdv-v-kbd">&larr;</span><span class="pdv-v-kbd">&rarr;</span> switch
             &nbsp;&nbsp;
-            <span class="aims-v-kbd">1</span>-<span class="aims-v-kbd">${pdfBlobs.length}</span> jump
+            <span class="pdv-v-kbd">1</span>-<span class="pdv-v-kbd">${pdfBlobs.length}</span> jump
             &nbsp;&nbsp;
-            <span class="aims-v-kbd">Esc</span> close
+            <span class="pdv-v-kbd">Esc</span> close
           </span>
-          <button class="aims-v-close" id="aims-v-close">&times;</button>
+          <button class="pdv-v-close" id="pdv-v-close">&times;</button>
         </div>
       </div>
-      <div class="aims-v-tabs" id="aims-v-tabs"></div>
-      <div class="aims-v-content" id="aims-v-content"></div>
+      <div class="pdv-v-tabs" id="pdv-v-tabs"></div>
+      <div class="pdv-v-content" id="pdv-v-content"></div>
     `;
     document.body.appendChild(overlay);
 
-    const tabsEl = overlay.querySelector('#aims-v-tabs');
-    const contentEl = overlay.querySelector('#aims-v-content');
+    const tabsEl = overlay.querySelector('#pdv-v-tabs');
+    const contentEl = overlay.querySelector('#pdv-v-content');
     let currentIdx = 0;
 
     const blobUrls = pdfBlobs.map(p => URL.createObjectURL(p.blob));
 
     function renderTab(idx) {
       currentIdx = idx;
-      tabsEl.querySelectorAll('.aims-v-tab').forEach((t, i) => {
+      tabsEl.querySelectorAll('.pdv-v-tab').forEach((t, i) => {
         t.classList.toggle('active', i === idx);
       });
       contentEl.innerHTML = '';
@@ -168,7 +168,7 @@
 
     pdfBlobs.forEach((pdf, i) => {
       const tab = document.createElement('button');
-      tab.className = 'aims-v-tab';
+      tab.className = 'pdv-v-tab';
       tab.textContent = pdf.type.replace(/_/g, ' ');
       tab.addEventListener('click', () => renderTab(i));
       tabsEl.appendChild(tab);
@@ -176,12 +176,12 @@
 
     renderTab(0);
 
-    overlay.querySelector('#aims-v-close').addEventListener('click', () => {
+    overlay.querySelector('#pdv-v-close').addEventListener('click', () => {
       overlay.remove();
     });
 
     function onKey(e) {
-      if (!document.getElementById('aims-viewer-overlay')) {
+      if (!document.getElementById('pdv-viewer-overlay')) {
         document.removeEventListener('keydown', onKey);
         return;
       }
@@ -202,8 +202,8 @@
   // ── Main button ──
 
   const btn = document.createElement('button');
-  btn.id = 'aims-dl-all-btn';
-  btn.innerHTML = '📥 Download All PDFs & Open Viewer';
+  btn.id = 'pdv-dl-all-btn';
+  btn.innerHTML = '📄 Open PDF Viewer';
   document.body.appendChild(btn);
 
   btn.addEventListener('click', async () => {
@@ -222,9 +222,13 @@
     }
 
     btn.disabled = true;
-    btn.innerHTML = '⏳ Downloading...';
+    btn.innerHTML = '⏳ Loading...';
 
     try {
+      const { saveToDisk } = await new Promise(resolve =>
+        chrome.storage.local.get('saveToDisk', resolve)
+      );
+
       const pdfBlobs = [];
 
       for (let i = 0; i < info.pdfs.length; i++) {
@@ -235,7 +239,7 @@
         if (!resp.ok) throw new Error(`Failed to fetch ${pdf.downloadName}: ${resp.status}`);
         const blob = await resp.blob();
 
-        downloadBlob(blob, pdf.downloadName);
+        if (saveToDisk) downloadBlob(blob, pdf.downloadName);
         pdfBlobs.push({ blob, type: pdf.type });
       }
 
@@ -243,13 +247,13 @@
       cachedData = { appNum: info.appNum, pdfBlobs };
 
       btn.disabled = false;
-      btn.innerHTML = '📥 Open Viewer';
+      btn.innerHTML = '📄 Open PDF Viewer';
 
       buildViewer(info.appNum, pdfBlobs);
 
     } catch (err) {
       btn.disabled = false;
-      btn.innerHTML = '📥 Download All PDFs & Open Viewer';
+      btn.innerHTML = '📄 Open PDF Viewer';
       alert('Error: ' + err.message);
     }
   });

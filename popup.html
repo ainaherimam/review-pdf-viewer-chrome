@@ -1,19 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <style>
   body { width: 260px; padding: 16px; font-family: -apple-system, sans-serif; font-size: 13px; color: #334155; }
   h3 { margin: 0 0 8px; font-size: 14px; }
-  p { margin: 0 0 10px; line-height: 1.4; color: #64748b; }
+  p { margin: 0 0 12px; line-height: 1.4; color: #64748b; }
   button { width: 100%; padding: 8px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
   button:hover { background: #1d4ed8; }
+
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; padding: 10px 12px;
+    background: #f1f5f9; border-radius: 8px;
+  }
+  .toggle-label { font-size: 13px; color: #334155; }
+  .toggle-label small { display: block; font-size: 11px; color: #94a3b8; margin-top: 1px; }
+
+  .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; cursor: pointer; inset: 0;
+    background: #cbd5e1; border-radius: 20px; transition: 0.2s;
+  }
+  .slider::before {
+    content: ''; position: absolute;
+    width: 14px; height: 14px; left: 3px; bottom: 3px;
+    background: white; border-radius: 50%; transition: 0.2s;
+  }
+  input:checked + .slider { background: #2563eb; }
+  input:checked + .slider::before { transform: translateX(16px); }
 </style>
 </head>
 <body>
-  <h3>📥 AIMS Review Helper</h3>
-  <p>Navigate to a review page on <strong>apply.aims.ac.za</strong>, then click the blue button at the bottom-right to download all PDFs and open the viewer.</p>
+  <h3>PDF Review Viewer</h3>
+  <p>Navigate to a review page, then click the blue button at the bottom-right to open the viewer.</p>
+
+  <div class="toggle-row">
+    <div class="toggle-label">
+      Save to disk
+      <small>Download files when opening viewer</small>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="saveToDisk">
+      <span class="slider"></span>
+    </label>
+  </div>
+
   <button id="openViewer">Open Last Viewer</button>
+
   <script>
+    const checkbox = document.getElementById('saveToDisk');
+
+    chrome.storage.local.get('saveToDisk', (res) => {
+      checkbox.checked = res.saveToDisk === true;
+    });
+
+    checkbox.addEventListener('change', () => {
+      chrome.storage.local.set({ saveToDisk: checkbox.checked });
+    });
+
     document.getElementById('openViewer').addEventListener('click', () => {
       chrome.tabs.create({ url: chrome.runtime.getURL('viewer.html') });
     });
